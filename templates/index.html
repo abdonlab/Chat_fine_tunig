@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot de la Universidad</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #chat-box { border: 1px solid #ccc; padding: 10px; margin-top: 20px; width: 100%; height: 300px; overflow-y: auto; }
+        #message { width: 80%; padding: 10px; }
+        button { padding: 10px 15px; }
+        .user-message { color: blue; }
+        .bot-response { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Bienvenido al Chatbot de la Universidad</h1>
+    <form id="chat-form">
+        <input type="text" id="message" placeholder="Escribe tu pregunta aquí" required>
+        <button type="submit">Enviar</button>
+    </form>
+
+    <div id="chat-box"></div>
+
+    <script>
+        document.getElementById('chat-form').onsubmit = async function(event) {
+            event.preventDefault();
+            
+            const userMessage = document.getElementById('message').value;
+            const chatBox = document.getElementById('chat-box');
+            
+            // Mostrar la pregunta en el chat
+            chatBox.innerHTML += `<div class="user-message">Tú: ${userMessage}</div>`;
+            document.getElementById('message').value = ''; // Limpiar el campo de entrada
+
+            // Enviar la solicitud al backend Flask como JSON
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: userMessage })
+            });
+
+            const data = await response.json();
+            const botReply = data.response;
+
+            // Mostrar la respuesta del modelo en el chat
+            chatBox.innerHTML += `<div class="bot-response">Bot: ${botReply}</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight; // Hacer scroll al final
+        };
+    </script>
+</body>
+</html>
